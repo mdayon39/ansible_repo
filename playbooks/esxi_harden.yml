@@ -1,0 +1,36 @@
+- name: Harden ESXi hosts based on VMware security guide
+  hosts: esxi_hosts
+  gather_facts: no
+  collections:
+    - community.vmware
+  vars_files:
+    - group_vars/all.yml
+
+  tasks:
+    - name: Get list of ESXi hosts
+      vmware_host_facts:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: "{{ validate_certs }}"
+      register: esxi_hosts
+
+    - name: Loop through hosts to apply security settings
+      vmware_host_config_manager:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: "{{ validate_certs }}"
+        esxi_hostname: "{{ item.name }}"
+        options:
+          - key: Config.HostAgent.plugins.solo.enableMob
+            value: "false"
+          - key: UserVars.ESXiShellTimeOut
+            value: "600"
+          - key: UserVars.SuppressShellWarning
+            value: "1"
+          - key: UserVars.ESXiShellInteractiveTimeOut
+            value: "300"
+          - key: Config.HostAgent.plugins.solo.enableMob
+            value: "false"
+      loop: "{{ esxi_hosts.hosts }}"
