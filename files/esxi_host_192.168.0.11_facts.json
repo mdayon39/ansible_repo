@@ -1,0 +1,72 @@
+{
+    "ansible_facts": {
+        "ansible_all_ipv4_addresses": [
+            "192.168.0.11"
+        ],
+        "ansible_bios_date": "2020-11-12T00:00:00+00:00",
+        "ansible_bios_version": "6.00",
+        "ansible_datastore": [
+            {
+                "free": "97.28 GB",
+                "name": "vsanDatastore",
+                "total": "99.98 GB"
+            }
+        ],
+        "ansible_distribution": "VMware ESXi",
+        "ansible_distribution_build": "24280767",
+        "ansible_distribution_version": "8.0.3",
+        "ansible_host_connection_state": "connected",
+        "ansible_hostname": "esxi1.atsi.com",
+        "ansible_in_maintenance_mode": false,
+        "ansible_interfaces": [
+            "vmk0"
+        ],
+        "ansible_memfree_mb": 9158,
+        "ansible_memtotal_mb": 16383,
+        "ansible_os_type": "vmnix-x86",
+        "ansible_processor": "Intel(R) Core(TM) i5-14400",
+        "ansible_processor_cores": 8,
+        "ansible_processor_count": 8,
+        "ansible_processor_vcpus": 8,
+        "ansible_product_name": "VMware Virtual Platform",
+        "ansible_product_serial": "VMware-56 4d d3 c8 a1 5b 85 70-d7 00 d6 b1 52 f1 f8 d8",
+        "ansible_system_vendor": "VMware, Inc.",
+        "ansible_uptime": 27187,
+        "ansible_uuid": "c8d34d56-5ba1-7085-d700-d6b152f1f8d8",
+        "ansible_vmk0": {
+            "device": "vmk0",
+            "ipv4": {
+                "address": "192.168.0.11",
+                "netmask": "255.255.255.0"
+            },
+            "macaddress": "00:0c:29:f1:f8:d8",
+            "mtu": 9000
+        },
+        "cluster": null,
+        "host_date_time": {
+            "date": "2025-07-24",
+            "day": "24",
+            "epoch": "1753379621",
+            "hour": "17",
+            "iso8601": "2025-07-24T17:53:41Z",
+            "iso8601_basic": "20250724T175341044838",
+            "iso8601_basic_short": "20250724T175341",
+            "iso8601_micro": "2025-07-24T17:53:41.044838Z",
+            "minute": "53",
+            "month": "07",
+            "second": "41",
+            "time": "17:53:41",
+            "tz": "UTC",
+            "tz_offset": "+0000",
+            "weekday": "Thursday",
+            "weekday_number": "4",
+            "weeknumber": "29",
+            "year": "2025"
+        },
+        "vsan_cluster_uuid": "528444b3-2c0a-1847-3363-e70159a05223",
+        "vsan_health": "healthy",
+        "vsan_node_uuid": "686808a2-a10b-940e-0b30-000c29f1f8f6"
+    },
+    "changed": false,
+    "failed": false
+}

@@ -1,0 +1,62 @@
+[
+    {
+        "key": "infravisor",
+        "label": "infravisor",
+        "policy": "on",
+        "required": false,
+        "running": true,
+        "source_package_desc": "This VIB contains all of the base functionality of infravisor spherelet.",
+        "source_package_name": "infravisor",
+        "uninstallable": false
+    },
+    {
+        "key": "lbtd",
+        "label": "Load-Based Teaming Daemon",
+        "policy": "on",
+        "required": false,
+        "running": true,
+        "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+        "source_package_name": "esx-base",
+        "uninstallable": false
+    },
+    {
+        "key": "lwsmd",
+        "label": "Active Directory Service",
+        "policy": "on",
+        "required": false,
+        "running": true,
+        "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+        "source_package_name": "esx-base",
+        "uninstallable": false
+    },
+    {
+        "key": "vdtc",
+        "label": "VDTC Service",
+        "policy": "on",
+        "required": false,
+        "running": true,
+        "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+        "source_package_name": "esx-base",
+        "uninstallable": false
+    },
+    {
+        "key": "vmsyslogd",
+        "label": "Syslog Server",
+        "policy": "on",
+        "required": true,
+        "running": true,
+        "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+        "source_package_name": "esx-base",
+        "uninstallable": false
+    },
+    {
+        "key": "vpxa",
+        "label": "VMware vCenter Agent",
+        "policy": "on",
+        "required": false,
+        "running": true,
+        "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+        "source_package_name": "esx-base",
+        "uninstallable": false
+    }
+]

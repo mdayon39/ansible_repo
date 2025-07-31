@@ -1,0 +1,94 @@
+{
+    "ansible_facts": {
+        "ansible_all_ipv4_addresses": [
+            "192.168.0.12",
+            "192.168.20.12",
+            "192.168.30.12"
+        ],
+        "ansible_bios_date": "2020-11-12T00:00:00+00:00",
+        "ansible_bios_version": "6.00",
+        "ansible_datastore": [
+            {
+                "free": "98.04 GB",
+                "name": "vsanDatastore",
+                "total": "99.98 GB"
+            }
+        ],
+        "ansible_distribution": "VMware ESXi",
+        "ansible_distribution_build": "24280767",
+        "ansible_distribution_version": "8.0.3",
+        "ansible_host_connection_state": "connected",
+        "ansible_hostname": "esxi2.atsi.com",
+        "ansible_in_maintenance_mode": false,
+        "ansible_interfaces": [
+            "vmk0",
+            "vmk1",
+            "vmk2"
+        ],
+        "ansible_memfree_mb": 9164,
+        "ansible_memtotal_mb": 16383,
+        "ansible_os_type": "vmnix-x86",
+        "ansible_processor": "Intel(R) Core(TM) i5-14400",
+        "ansible_processor_cores": 8,
+        "ansible_processor_count": 8,
+        "ansible_processor_vcpus": 8,
+        "ansible_product_name": "VMware Virtual Platform",
+        "ansible_product_serial": "VMware-56 4d 9b 5a b9 c0 9f 8a-fc 93 b4 1b fe 0c b7 aa",
+        "ansible_system_vendor": "VMware, Inc.",
+        "ansible_uptime": 8108,
+        "ansible_uuid": "5a9b4d56-c0b9-8a9f-fc93-b41bfe0cb7aa",
+        "ansible_vmk0": {
+            "device": "vmk0",
+            "ipv4": {
+                "address": "192.168.0.12",
+                "netmask": "255.255.255.0"
+            },
+            "macaddress": "00:0c:29:0c:b7:aa",
+            "mtu": 9000
+        },
+        "ansible_vmk1": {
+            "device": "vmk1",
+            "ipv4": {
+                "address": "192.168.20.12",
+                "netmask": "255.255.255.0"
+            },
+            "macaddress": "00:50:56:62:26:4c",
+            "mtu": 9000
+        },
+        "ansible_vmk2": {
+            "device": "vmk2",
+            "ipv4": {
+                "address": "192.168.30.12",
+                "netmask": "255.255.255.0"
+            },
+            "macaddress": "00:50:56:6d:d8:46",
+            "mtu": 9000
+        },
+        "cluster": null,
+        "host_date_time": {
+            "date": "2025-07-24",
+            "day": "24",
+            "epoch": "1753379621",
+            "hour": "17",
+            "iso8601": "2025-07-24T17:53:41Z",
+            "iso8601_basic": "20250724T175341532264",
+            "iso8601_basic_short": "20250724T175341",
+            "iso8601_micro": "2025-07-24T17:53:41.532264Z",
+            "minute": "53",
+            "month": "07",
+            "second": "41",
+            "time": "17:53:41",
+            "tz": "UTC",
+            "tz_offset": "+0000",
+            "weekday": "Thursday",
+            "weekday_number": "4",
+            "weeknumber": "29",
+            "year": "2025"
+        },
+        "vsan_cluster_uuid": "528444b3-2c0a-1847-3363-e70159a05223",
+        "vsan_health": "healthy",
+        "vsan_node_uuid": "68680ca6-7a4a-38db-6d5a-000c290cb7c8"
+    },
+    "changed": false,
+    "failed": false
+}

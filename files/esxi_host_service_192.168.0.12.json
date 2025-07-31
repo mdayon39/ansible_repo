@@ -1,0 +1,268 @@
+{
+    "changed": false,
+    "failed": false,
+    "host_service_info": {
+        "esxi2.atsi.com": [
+            {
+                "key": "DCUI",
+                "label": "Direct Console UI",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "TSM",
+                "label": "ESXi Shell",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "TSM-SSH",
+                "label": "SSH",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "apiForwarder",
+                "label": "apiForwarder",
+                "policy": "on",
+                "required": false,
+                "running": true,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "attestd",
+                "label": "attestd",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "dpd",
+                "label": "dpd",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This package contains all of the functionality of VMware vSphere Data Protection.",
+                "source_package_name": "vmware-dp",
+                "uninstallable": false
+            },
+            {
+                "key": "entropyd",
+                "label": "entropyd",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "gpuManager",
+                "label": "gpuManager",
+                "policy": "on",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "hbrsrv",
+                "label": "hbrsrv",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the functionality of vSphere Replication.",
+                "source_package_name": "vmware-hbrsrv",
+                "uninstallable": false
+            },
+            {
+                "key": "infravisor",
+                "label": "infravisor",
+                "policy": "on",
+                "required": false,
+                "running": true,
+                "source_package_desc": "This VIB contains all of the base functionality of infravisor spherelet.",
+                "source_package_name": "infravisor",
+                "uninstallable": false
+            },
+            {
+                "key": "kmxd",
+                "label": "kmxd",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "lbtd",
+                "label": "Load-Based Teaming Daemon",
+                "policy": "on",
+                "required": false,
+                "running": true,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "lwsmd",
+                "label": "Active Directory Service",
+                "policy": "on",
+                "required": false,
+                "running": true,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "ntpd",
+                "label": "NTP Daemon",
+                "policy": "on",
+                "required": false,
+                "running": true,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "nvmf-discoveryd",
+                "label": "nvmf-discoveryd",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "pcscd",
+                "label": "PC/SC Smart Card Daemon",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "ptpd",
+                "label": "PTP Daemon",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "sfcbd-watchdog",
+                "label": "CIM Server",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "slpd",
+                "label": "slpd",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "snmpd",
+                "label": "SNMP Server",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "vdtc",
+                "label": "VDTC Service",
+                "policy": "on",
+                "required": false,
+                "running": true,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "vltd",
+                "label": "vltd",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains all of the functionality of VMware Datrium VLT.",
+                "source_package_name": "vmware-dp-vlt",
+                "uninstallable": false
+            },
+            {
+                "key": "vmsyslogd",
+                "label": "Syslog Server",
+                "policy": "on",
+                "required": true,
+                "running": true,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "vmware-fdm",
+                "label": "vSphere High Availability Agent",
+                "policy": "off",
+                "required": false,
+                "running": false,
+                "source_package_desc": null,
+                "source_package_name": null,
+                "uninstallable": false
+            },
+            {
+                "key": "vpxa",
+                "label": "VMware vCenter Agent",
+                "policy": "on",
+                "required": false,
+                "running": true,
+                "source_package_desc": "This VIB contains all of the base functionality of vSphere ESXi.",
+                "source_package_name": "esx-base",
+                "uninstallable": false
+            },
+            {
+                "key": "xorg",
+                "label": "X.Org Server",
+                "policy": "on",
+                "required": false,
+                "running": false,
+                "source_package_desc": "This VIB contains X Server used for virtual machine 3D hardware acceleration.",
+                "source_package_name": "esx-xserver",
+                "uninstallable": false
+            }
+        ]
+    }
+}
