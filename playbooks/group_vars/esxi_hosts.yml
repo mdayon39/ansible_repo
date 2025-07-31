@@ -1,0 +1,27 @@
+---
+
+shell_timeout: 50
+
+unused_services:
+  - sfcbd-watchdog
+  - snmpd
+  - DCUI
+  - slpd
+  - ntpd
+  - apiForwarder
+
+unused_users:
+  - test1
+  - test2
+
+vm_names:
+  - VM1
+  - VM2
+
+ntp_server_ip: '192.168.0.11'
+service_name_ntpd: 'ntpd'
+service_name_tsm_ssh: 'TSM-SSH'
+service_name_tsm: 'TSM'
+
+domain: 'atsi.com'
+ad_user: 'atsi\\administrator'

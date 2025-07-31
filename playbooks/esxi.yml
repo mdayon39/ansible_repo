@@ -1,0 +1,459 @@
+---
+
+- name: Automation of ESXI Hardening # Playbook's name
+  hosts: esxi_hosts # Runs against hosts defined under the group esxi_hosts in inventory
+  gather_facts: no # set because esxi is not a traditional linux OS, so ansible facts cannot be colleted normally via SSH
+
+  tasks:
+    - name: (1) Set NTP Servers. Configure trusted NTP servers and ensure time sync is enabled
+      tags: t1 # Tags used to selectively run specific parts of a playbook
+      community.vmware.vmware_host_ntp: # This uses the vmware_host_ntp module from the community.vmware collection to configure NTP settings via the VMware API (not SSH).
+        hostname: "{{esxi_host}}" # The IP or FQDN of the ESXi host
+        username: "{{esxi_user}}" # vSphere/ESXi login username
+        password: "{{esxi_password}}" # Corresponding password.
+        validate_certs: no # Disables SSL cert validation. Often needed if ESXi uses self-signed certs.
+        esxi_hostname: "{{esxi_host}}" # Hostname of the target ESXi host. Required by the module to identify which host to configure.
+        ntp_servers: "{{ ntp_server_ip }}" # The NTP server IPs or FQDNs to configure on the ESXi host.
+      delegate_to: localhost # Tells Ansible to run the task on the control node (localhost)
+
+    - name: (1) Start and enable NTP service
+      tags: t1
+      community.vmware.vmware_host_service_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{ esxi_host }}"
+        service_name: "{{ service_name_ntpd }}"
+        state: start # Desired state of service
+        service_policy: on # service should be started when the host starts up
+      delegate_to: localhost
+
+
+    - name: (2) Enable Lockdown Mode. Set ESXi host to Lockdown Mode (normal or strict)
+      tags: t2
+      community.vmware.vmware_host_lockdown:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        state: normal
+      delegate_to: localhost
+
+
+    - name: (3) Disable SSH. Ensure SSH is disabled and set to manual start.
+      tags: t3
+      community.vmware.vmware_host_service_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        service_name: "{{ service_name_tsm_ssh }}"
+        state: stop
+        service_policy: off # Service should not be started when the host starts up.
+      delegate_to: localhost
+
+
+    - name: (4) Disable ESXi Shell. Turn off ESXi Shell and set service policy to manual
+      tags: t4
+      community.vmware.vmware_host_service_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        service_name: "{{ service_name_tsm }}"
+        state: stop
+        service_policy: off
+      delegate_to: localhost
+
+    - name: (5) Set Shell Timeout. Configure shell timeout (ESXiShellTimeOut) for idle sessions
+      tags: t5
+      community.vmware.vmware_host_config_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        options: # A dictionary of advanced system settings.
+          UserVars.ESXiShellTimeOut: "{{ shell_timeout }}"
+      delegate_to: localhost
+
+
+    - name: (6) Enforce Password Policy. Set password complexity, aging, and reuse limits.
+      tags: t6
+      community.vmware.vmware_host_config_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        options:
+          'Security.PasswordQualityControl': "similar=deny retry=3 min=disabled,disabled,12,2,2" # Enforces password complexity rules
+          'Security.PasswordHistory': "5" # Prevents reuse of 5 previous passwords
+          'Security.PasswordMaxDays': "90" # Password expiration in days
+      delegate_to: localhost
+
+
+    - name: (7) Configure Account Lockout. Define lockout attempts, delay, and duration.
+      tags: t7
+      community.vmware.vmware_host_config_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        options:
+          'Security.AccountLockFailures': 3 # Lock account after 3 failed logins
+          'Security.AccountUnlockTime': 120 # Unlock automatically after 2 minutes
+      delegate_to: localhost
+
+
+    - name: (8) Get list of all local users
+      tags: t8
+      community.vmware.vmware_local_user_info:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+      delegate_to: localhost
+      register: all_user_info
+
+    - name: (8.2) Set fact for all local user except root
+      tags: t8
+      set_fact:
+        host_all_users: >- # All users except root
+          {{ all_user_info.local_user_info
+             | rejectattr('user_name', 'equalto', 'root')
+             | map(attribute='user_name')
+             | list }}
+
+    - name: (8.3) Remove Unused Accounts. Disable or delete unused local user accounts
+      tags: t8
+      community.vmware.vmware_host_user_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{inventory_hostname}}"
+        user_name: "{{ item }}"
+        state: absent
+      loop: "{{ host_all_users }}"
+      delegate_to: localhost
+
+    - name: (9) Set Host Acceptance Level. Enforce acceptance level to (PartnerSupported) or higher.
+      tags: t9
+      community.vmware.vmware_host_acceptance:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{inventory_hostname}}"
+        state: 'vmware_certified' # accept only VIBs (vSphere Installation Bundle) that are signed and certified by VMware.
+      delegate_to: localhost
+
+
+    - name: (10) Disable Copy-Paste. Apply VM advanced settings to disable console clipboard features. (Retrieve all the VMs info.)
+      tags: t10
+      community.vmware.vmware_vm_info:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+      register: all_vm_info
+      delegate_to: localhost
+
+    - name: (10.2) Set fact for disable Copy-Paste
+      tags: t10
+      set_fact:
+        all_vm_except_vcls: >-
+          {{ all_vm_info.virtual_machines
+             | rejectattr('guest_name', 'search', '^vCLS')
+             | map(attribute='guest_name')
+             | list }}
+
+    - name: Show VM info
+      tags: t10
+      debug:
+        var: all_vm_except_vcls
+
+    - name: (10.3) Disable Copy-Paste. Apply VM advanced settings to disable console clipboard features. (Apply advanced settings (copy-paste disable) to all the VMs)
+      tags: t10
+      community.vmware.vmware_guest:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        name: "{{ item }}"
+        folder: /
+        state: poweredoff
+        advanced_settings:
+          - key: isolation.tools.copy.disable # Disables copy into the VM via console
+            value: 'true'
+          - key: isolation.tools.paste.disable # Disables paste from the VM via console
+            value: 'true'
+      loop: "{{ all_vm_except_vcls }}"
+      delegate_to: localhost
+
+    - name: (10.4) Disable Copy-Paste. Apply VM advanced settings to disable console clipboard features. (Power on the VMs)
+      tags: t10
+      community.vmware.vmware_guest:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        name: "{{ item }}"
+        folder: /
+        state: poweredon
+      loop: "{{ all_vm_except_vcls }}"
+      delegate_to: localhost
+
+    - name: (11) Disable VMware Tools Scripts, Prevent guest OS scripts from being executed
+      tags: t11
+      community.vmware.vmware_vm_info:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+      register: all_vm_info
+      delegate_to: localhost
+
+    - name: (11.2) Set fact for disable VMware tools VMs
+      tags: t11
+      set_fact:
+        all_vm_except_vcls: >-
+          {{ all_vm_info.virtual_machines
+             | rejectattr('guest_name', 'search', '^vCLS')
+             | map(attribute='guest_name')
+             | list }}
+
+    - name: Search VMs except vCLS
+      tags: t11
+      debug:
+        var: all_vm_except_vcls
+
+
+    - name: (11) Disable VMware Tools Scripts, Prevent guest OS scripts from being executed
+      tags: t11
+      community.vmware.vmware_guest:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        name: "{{ item }}"
+        folder: /
+        state: poweredoff
+        advanced_settings:
+          - key: toolsScripts.afterPowerOn # Disables script execution after VM powers on
+            value: 'false'
+          - key: toolsScripts.beforePowerOff # Disables script execution before VM powers off
+            value: "false"
+          - key: toolsScripts.beforeSuspend # Disables script execution before VM is suspended
+            value: "false"
+          - key: toolsScripts.afterResume # Disables script execution after VM resumes
+            value: "false"
+      loop: "{{ all_vm_except_vcls }}"
+      delegate_to: localhost
+
+
+    - name: (12) Get list of all services and their status
+      tags: t12
+      community.vmware.vmware_host_service_info:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+      delegate_to: localhost
+      register: host_services # Contains all services
+
+    - name: (12.2) Set fact for running services only
+      tags: t12
+      set_fact:
+        host_services_running: >- # Contains only running services
+          {{ host_services.host_service_info[inventory_hostname]
+             | selectattr('running', 'equalto', true)
+             | list }}
+
+    - name: (12.3) Save running services to a file
+      tags: t12
+      copy:
+        content: "{{ host_services_running | to_nice_json }}"
+        dest: "~/ansible_repo/files/esxi_host_{{ esxi_host }}_running_services.json"
+      delegate_to: localhost
+      register: host_services_saved
+
+    - name: (12.4) Remove unused running services
+      tags: t12
+      community.vmware.vmware_host_service_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        service_name: "{{ item.key }}"
+        state: stop
+        service_policy: off
+      loop: "{{ host_services_running }}"
+      when:
+        - item.key in unused_services
+        - item.running | default(false)
+      register: host_services_stopped
+      delegate_to: localhost
+
+    - name: (12.5) Set fact for stopped services only
+      tags: t12
+      set_fact:
+        host_services_stopped: >-
+          {{ host_services.host_service_info[inventory_hostname]
+             | selectattr('running', 'equalto', false)
+             | list }}
+
+    - name: (12.6) Save stopped services to a file
+      tags: t12
+      copy:
+        content: "{{ host_services_stopped | to_nice_json }}"
+        dest: "~/ansible_repo/files/esxi_host_{{ inventory_hostname  }}_stopped_running_services.json"
+      delegate_to: localhost
+
+
+    - name: (13) Configure Firewall Rules Allow only essential services; block unused ports
+      tags: t13
+      community.vmware.vmware_host_firewall_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        rules:
+          - name: sshServer # Allow port 22
+            enabled: true
+          - name: webAccess # Block port 80
+            enabled: false
+          - name: syslog
+            enabled: true
+      delegate_to: localhost
+
+    - name: (14) Restrict DCUI Access. Limit local console access to approved users only.
+      tags: t14
+      community.vmware.vmware_host_config_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        options:
+          'DCUI.Access': 'root'
+      delegate_to: localhost
+
+
+    - name: (15) Host Facts
+      tags: t15
+      community.vmware.vmware_host_facts:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+      delegate_to: localhost
+      register: host_facts
+
+    - name: Show ESXI host names
+      tags: t15
+      debug:
+        var: host_facts
+
+
+    - name: (15) Join to AD Domain
+      tags: t1515
+      community.vmware.vmware_host_active_directory:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        domain: "{{ domain }}"
+        ad_user: "{{ ad_user }}"
+        ad_password: "{{ ad_password }}"
+        state: present
+      delegate_to: localhost
+
+
+    - name: (15) Integrate ESXi with Active Directory for RBAC.
+      tags: t1515
+      community.vmware.vmware_object_role_permission:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+#        esxi_hostname: "{{esxi_host}}"
+        object_name: "{{ item.name }}"
+        object_type: "HostSystem"
+        principal: 'atsi.com\\ESXi_Admin_Group'
+        role: Admin
+        state: present
+      loop: "{{ host_facts.ansible_facts.esxi_hosts }}"
+      delegate_to: localhost
+
+
+    - name: (15) Enable AD Authentication (if needed manually)
+      tags: t1515
+      community.vmware.vmware_host_config_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        options:
+          Config.HostAgent.plugins.hostsvc.auth.defaultAuth: "ActiveDirectory"
+      delegate_to: localhost
+
+
+    - name: (16) Set Syslog Target Forward logs to a remote syslog server for auditability.
+      tags: t16
+      community.vmware.vmware_host_config_manager:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        options:
+          Syslog.global.logHost: "udp://192.168.1.67" # system-wide events. ESXi advanced system setting that specifies the remote syslog server address where the ESXi host sends its log messages.
+      delegate_to: localhost
+
+
+    - name: (17) Disable IPv6 (if unused) Turn off IPv6 if not required in the environment.
+      tags: t17
+      community.vmware.vmware_host_ipv6:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+        state: disabled
+      delegate_to: localhost
+
+
+    - name: (20) Collect Host Facts. Use vmware_host_facts to gather and log host settings for compliance reporting.
+      tags: t20
+      community.vmware.vmware_host_facts:
+        hostname: "{{esxi_host}}"
+        username: "{{esxi_user}}"
+        password: "{{esxi_password}}"
+        validate_certs: no
+        esxi_hostname: "{{esxi_host}}"
+      register: host_facts
+      delegate_to: localhost
+
+
+    - name: (20) Save ESXi host facts to file for compliance
+      copy:
+        content: "{{ host_facts | to_nice_json }}" # Converts data to JSON. Adds indentation and line breaks for readability
+        dest: "~/ansible_repo/files/esxi_host_{{ esxi_host }}_facts.json"
+      tags: t20
+      delegate_to: localhost
